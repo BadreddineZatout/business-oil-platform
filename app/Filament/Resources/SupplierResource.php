@@ -2,14 +2,15 @@
 
 namespace App\Filament\Resources;
 
-use App\Filament\Resources\SupplierResource\Pages;
-use App\Models\Supplier;
 use Filament\Forms;
-use Filament\Forms\Components\SpatieMediaLibraryFileUpload;
-use Filament\Forms\Form;
-use Filament\Resources\Resource;
 use Filament\Tables;
+use App\Models\Category;
+use App\Models\Supplier;
+use Filament\Forms\Form;
 use Filament\Tables\Table;
+use Filament\Resources\Resource;
+use App\Filament\Resources\SupplierResource\Pages;
+use Filament\Forms\Components\SpatieMediaLibraryFileUpload;
 
 class SupplierResource extends Resource
 {
@@ -25,15 +26,22 @@ class SupplierResource extends Resource
                     ->required()
                     ->maxLength(255),
                 Forms\Components\Select::make('country_id')
-                    ->relationship('country', 'name')->searchable(),
+                    ->relationship('country', 'name')->searchable()
+                    ->required(),
                 Forms\Components\TextInput::make('email')
                     ->email()
                     ->required()
                     ->maxLength(255),
                 Forms\Components\TextInput::make('address')
+                    ->required()
                     ->maxLength(255),
                 Forms\Components\Textarea::make('description')
                     ->maxLength(65535)
+                    ->columnSpanFull(),
+                Forms\Components\Select::make('category')
+                    ->options(Category::all()->pluck('name', 'id'))
+                    ->multiple()
+                    ->required()
                     ->columnSpanFull(),
                 SpatieMediaLibraryFileUpload::make('image')
                     ->preserveFilenames()
@@ -45,15 +53,12 @@ class SupplierResource extends Resource
     {
         return $table
             ->columns([
-                Tables\Columns\TextColumn::make('country.name')
-                    ->numeric()
-                    ->sortable(),
                 Tables\Columns\TextColumn::make('name')
                     ->searchable(),
-                Tables\Columns\TextColumn::make('email')
-                    ->searchable(),
-                Tables\Columns\TextColumn::make('address')
-                    ->searchable(),
+                Tables\Columns\TextColumn::make('country.name')
+                    ->sortable(),
+                Tables\Columns\TextColumn::make('email'),
+                Tables\Columns\TextColumn::make('address'),
             ])
             ->filters([
                 //

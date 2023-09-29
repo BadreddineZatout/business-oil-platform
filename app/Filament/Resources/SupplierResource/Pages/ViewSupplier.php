@@ -16,4 +16,11 @@ class ViewSupplier extends ViewRecord
             Actions\EditAction::make(),
         ];
     }
+
+    protected function mutateFormDataBeforeFill(array $data): array
+    {
+        $data['category'] = $this->record->categories->pluck('id')->toArray();
+
+        return $data;
+    }
 }

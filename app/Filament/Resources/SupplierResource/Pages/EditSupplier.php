@@ -17,4 +17,9 @@ class EditSupplier extends EditRecord
             Actions\DeleteAction::make(),
         ];
     }
+
+    protected function afterSave(): void
+    {
+        $this->record->categories()->sync($this->data['category']);
+    }
 }
