@@ -60,6 +60,8 @@ class SupplierResource extends Resource
                     ->collection('supplier_media'),
                 Tables\Columns\TextColumn::make('name')
                     ->searchable(),
+                Tables\Columns\TextColumn::make('categories.name')
+                    ->listWithLineBreaks(),
                 Tables\Columns\TextColumn::make('country.name')
                     ->description(fn (Supplier $record): string => $record->address)
                     ->sortable(),
