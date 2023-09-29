@@ -10,6 +10,7 @@ use Filament\Forms\Form;
 use Filament\Tables\Table;
 use Filament\Resources\Resource;
 use App\Filament\Resources\SupplierResource\Pages;
+use Filament\Tables\Columns\SpatieMediaLibraryImageColumn;
 use Filament\Forms\Components\SpatieMediaLibraryFileUpload;
 
 class SupplierResource extends Resource
@@ -53,12 +54,14 @@ class SupplierResource extends Resource
     {
         return $table
             ->columns([
+                SpatieMediaLibraryImageColumn::make('image')
+                    ->collection('supplier_media'),
                 Tables\Columns\TextColumn::make('name')
                     ->searchable(),
                 Tables\Columns\TextColumn::make('country.name')
+                    ->description(fn (Supplier $record): string => $record->address)
                     ->sortable(),
                 Tables\Columns\TextColumn::make('email'),
-                Tables\Columns\TextColumn::make('address'),
             ])
             ->filters([
                 //
