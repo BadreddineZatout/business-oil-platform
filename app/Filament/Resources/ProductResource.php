@@ -13,14 +13,29 @@ use Filament\Support\Enums\FontWeight;
 use App\Filament\Resources\ProductResource\Pages;
 use Filament\Tables\Columns\SpatieMediaLibraryImageColumn;
 use Filament\Forms\Components\SpatieMediaLibraryFileUpload;
+use Illuminate\Database\Eloquent\Model;
 
 class ProductResource extends Resource
 {
     protected static ?string $model = Product::class;
 
+    protected static ?string $recordTitleAttribute = 'name';
+
     protected static ?string $navigationIcon = 'heroicon-o-shopping-cart';
 
     protected static ?int $navigationSort = 2;
+
+    public static function getGlobalSearchResultDetails(Model $record): array
+    {
+        return [
+            'Supplier' => $record->supplier->name,
+        ];
+    }
+
+    public static function getGlobalSearchResultUrl(Model $record): string
+    {
+        return self::getUrl('view', ['record' => $record]);
+    }
 
     public static function form(Form $form): Form
     {
