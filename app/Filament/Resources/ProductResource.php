@@ -2,16 +2,17 @@
 
 namespace App\Filament\Resources;
 
-use App\Filament\Resources\ProductResource\Pages;
-use App\Models\Category;
-use App\Models\Product;
 use Filament\Forms;
-use Filament\Forms\Components\SpatieMediaLibraryFileUpload;
-use Filament\Forms\Form;
-use Filament\Resources\Resource;
 use Filament\Tables;
-use Filament\Tables\Columns\SpatieMediaLibraryImageColumn;
+use App\Models\Product;
+use App\Models\Category;
+use Filament\Forms\Form;
 use Filament\Tables\Table;
+use Filament\Resources\Resource;
+use Filament\Support\Enums\FontWeight;
+use App\Filament\Resources\ProductResource\Pages;
+use Filament\Tables\Columns\SpatieMediaLibraryImageColumn;
+use Filament\Forms\Components\SpatieMediaLibraryFileUpload;
 
 class ProductResource extends Resource
 {
@@ -54,7 +55,14 @@ class ProductResource extends Resource
                     ->collection('product_media'),
                 Tables\Columns\TextColumn::make('name')
                     ->searchable(),
-                Tables\Columns\TextColumn::make('supplier.name'),
+                Tables\Columns\TextColumn::make('supplier.name')
+                    ->color('primary')
+                    ->weight(FontWeight::Bold)
+                    ->url(function ($record) {
+                        return route('filament.admin.resources.suppliers.view', ['record' => $record]);
+                    }, true),
+                Tables\Columns\TextColumn::make('categories.name')
+                    ->listWithLineBreaks(),
             ])
             ->filters([
                 //
