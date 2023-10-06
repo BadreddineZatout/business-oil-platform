@@ -57,7 +57,7 @@ class UserResource extends Resource
                     ->color(fn (string $state): string => match ($state) {
                         'user' => 'success',
                         'admin' => 'danger',
-                    })
+                    }),
             ])
             ->filters([
                 //
