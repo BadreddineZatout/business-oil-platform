@@ -2,17 +2,17 @@
 
 namespace App\Filament\Resources;
 
-use Filament\Forms;
-use Filament\Tables;
-use App\Models\Product;
+use App\Filament\Resources\ProductResource\Pages;
 use App\Models\Category;
+use App\Models\Product;
+use Filament\Forms;
+use Filament\Forms\Components\SpatieMediaLibraryFileUpload;
 use Filament\Forms\Form;
-use Filament\Tables\Table;
 use Filament\Resources\Resource;
 use Filament\Support\Enums\FontWeight;
-use App\Filament\Resources\ProductResource\Pages;
+use Filament\Tables;
 use Filament\Tables\Columns\SpatieMediaLibraryImageColumn;
-use Filament\Forms\Components\SpatieMediaLibraryFileUpload;
+use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Model;
 
 class ProductResource extends Resource
