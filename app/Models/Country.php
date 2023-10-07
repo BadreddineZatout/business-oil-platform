@@ -10,6 +10,8 @@ class Country extends Model
 {
     use HasFactory;
 
+    const ALGERIA = 3;
+
     protected $fillable = ['name'];
 
     public function suppliers(): HasMany
