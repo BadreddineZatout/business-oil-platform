@@ -2,17 +2,22 @@
 
 namespace App\Filament\Resources;
 
-use App\Filament\Resources\SupplierResource\Pages;
+use Filament\Forms;
+use Filament\Tables;
 use App\Models\Category;
 use App\Models\Supplier;
-use Filament\Forms;
-use Filament\Forms\Components\SpatieMediaLibraryFileUpload;
 use Filament\Forms\Form;
-use Filament\Resources\Resource;
-use Filament\Tables;
-use Filament\Tables\Columns\SpatieMediaLibraryImageColumn;
 use Filament\Tables\Table;
+use Filament\Resources\Resource;
 use Illuminate\Database\Eloquent\Model;
+use Filament\Tables\Filters\SelectFilter;
+use App\Filament\Resources\SupplierResource\Pages;
+use App\Models\Country;
+use Filament\Forms\Components\Radio;
+use Filament\Tables\Columns\SpatieMediaLibraryImageColumn;
+use Filament\Forms\Components\SpatieMediaLibraryFileUpload;
+use Filament\Tables\Filters\Filter;
+use Illuminate\Database\Eloquent\Builder;
 
 class SupplierResource extends Resource
 {
@@ -102,7 +107,27 @@ class SupplierResource extends Resource
                     ->default('---'),
             ])
             ->filters([
-                //
+                Filter::make('supplier_region')
+                    ->form([
+                        Radio::make('region')
+                            ->options([
+                                'local' => 'Local',
+                                'expat' => 'Expat',
+                            ]),
+                    ])
+                    ->query(function (Builder $query, array $data): Builder {
+                        return $query
+                            ->when(
+                                $data['region'],
+                                function (Builder $query, $region): Builder {
+                                    return $region == 'local' ? $query->where('country_id', Country::ALGERIA) : $query->where('country_id', '!=', Country::ALGERIA);
+                                },
+                            );
+                    }),
+                SelectFilter::make('Countries')
+                    ->relationship('country', 'name')
+                    ->searchable()
+                    ->preload()
             ])
             ->actions([
                 Tables\Actions\ViewAction::make(),
@@ -113,13 +138,6 @@ class SupplierResource extends Resource
                     Tables\Actions\DeleteBulkAction::make(),
                 ]),
             ]);
-    }
-
-    public static function getRelations(): array
-    {
-        return [
-            //
-        ];
     }
 
     public static function getPages(): array
