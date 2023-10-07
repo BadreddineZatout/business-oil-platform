@@ -2,22 +2,24 @@
 
 namespace App\Filament\Resources;
 
-use Filament\Forms;
-use Filament\Tables;
-use App\Models\Category;
-use App\Models\Supplier;
-use Filament\Forms\Form;
-use Filament\Tables\Table;
-use Filament\Resources\Resource;
-use Illuminate\Database\Eloquent\Model;
-use Filament\Tables\Filters\SelectFilter;
 use App\Filament\Resources\SupplierResource\Pages;
+use App\Models\Category;
 use App\Models\Country;
+use App\Models\Supplier;
+use Filament\Forms;
 use Filament\Forms\Components\Radio;
-use Filament\Tables\Columns\SpatieMediaLibraryImageColumn;
+use Filament\Forms\Components\Select;
 use Filament\Forms\Components\SpatieMediaLibraryFileUpload;
+use Filament\Forms\Form;
+use Filament\Resources\Resource;
+use Filament\Tables;
+use Filament\Tables\Columns\SpatieMediaLibraryImageColumn;
+use Filament\Tables\Enums\FiltersLayout;
 use Filament\Tables\Filters\Filter;
+use Filament\Tables\Filters\SelectFilter;
+use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Model;
 
 class SupplierResource extends Resource
 {
@@ -126,9 +128,29 @@ class SupplierResource extends Resource
                     }),
                 SelectFilter::make('Countries')
                     ->relationship('country', 'name')
+                    ->multiple()
                     ->searchable()
-                    ->preload()
-            ])
+                    ->preload(),
+                SelectFilter::make('Categories')
+                    ->relationship('categories', 'name')
+                    ->multiple()
+                    ->searchable()
+                    ->preload(),
+                Filter::make('companies')
+                    ->form([
+                        Select::make('company')
+                            ->options(
+                                ['0' => '0', '1' => '1', '2' => '2', '3' => '3', '4' => '4', '5' => '5', '6' => '6', '7' => '7', '8' => '8', '9' => '9',  'A' => 'A', 'B' => 'B', 'C' => 'C', 'D' => 'D', 'E' => 'E', 'F' => 'F', 'G' => 'G', 'H' => 'H', 'I' => 'I', 'J' => 'J',  'K' => 'K', 'L' => 'L', 'M' => 'M', 'N' => 'N', 'O' => 'O', 'P' => 'P', 'Q' => 'Q', 'R' => 'R', 'S' => 'S', 'T' => 'T',  'U' => 'U', 'V' => 'V', 'W' => 'W', 'X' => 'X', 'Y' => 'Y', 'Z' => 'Z']
+                            )->searchable(),
+                    ])
+                    ->query(function (Builder $query, array $data): Builder {
+                        return $query
+                            ->when(
+                                $data['company'],
+                                fn (Builder $query, $country): Builder => $query->where('name', 'LIKE', $country.'%'),
+                            );
+                    }),
+            ], layout: FiltersLayout::AboveContent)
             ->actions([
                 Tables\Actions\ViewAction::make(),
                 Tables\Actions\EditAction::make(),
