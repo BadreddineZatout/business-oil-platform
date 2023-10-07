@@ -54,6 +54,7 @@ class SupplierResource extends Resource
                     ->maxLength(255),
                 Forms\Components\Select::make('country_id')
                     ->relationship('country', 'name')->searchable()
+                    ->preload()
                     ->required(),
                 Forms\Components\TextInput::make('email')
                     ->email()
