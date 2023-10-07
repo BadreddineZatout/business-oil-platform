@@ -55,6 +55,13 @@ class SupplierResource extends Resource
                 Forms\Components\TextInput::make('address')
                     ->required()
                     ->maxLength(255),
+                Forms\Components\TextInput::make('phone1')
+                    ->label('Phone Number 1')
+                    ->tel()
+                    ->required(),
+                Forms\Components\TextInput::make('phone2')
+                    ->label('Phone Number 2')
+                    ->tel(),
                 Forms\Components\Textarea::make('description')
                     ->maxLength(65535)
                     ->columnSpanFull(),
@@ -74,15 +81,25 @@ class SupplierResource extends Resource
         return $table
             ->columns([
                 SpatieMediaLibraryImageColumn::make('image')
-                    ->collection('supplier_media'),
+                    ->collection('supplier_media')
+                    ->toggleable(),
                 Tables\Columns\TextColumn::make('name')
-                    ->searchable(),
+                    ->searchable()
+                    ->toggleable(),
                 Tables\Columns\TextColumn::make('categories.name')
-                    ->listWithLineBreaks(),
+                    ->listWithLineBreaks()
+                    ->toggleable(),
                 Tables\Columns\TextColumn::make('country.name')
                     ->description(fn (Supplier $record): string => $record->address)
-                    ->sortable(),
-                Tables\Columns\TextColumn::make('email'),
+                    ->sortable()
+                    ->toggleable(),
+                Tables\Columns\TextColumn::make('email')->toggleable(),
+                Tables\Columns\TextColumn::make('phone1')
+                    ->toggleable()
+                    ->default('---'),
+                Tables\Columns\TextColumn::make('phone2')
+                    ->toggleable()
+                    ->default('---'),
             ])
             ->filters([
                 //
