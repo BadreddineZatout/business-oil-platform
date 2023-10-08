@@ -67,6 +67,7 @@ class ProductResource extends Resource
                     ->columnSpanFull(),
                 SpatieMediaLibraryFileUpload::make('image')
                     ->preserveFilenames()
+                    ->disk('public_html')
                     ->collection('product_media'),
             ]);
     }
@@ -83,7 +84,7 @@ class ProductResource extends Resource
                     ->color('primary')
                     ->weight(FontWeight::Bold)
                     ->url(function ($record) {
-                        return route('filament.admin.resources.suppliers.view', ['record' => $record]);
+                        return route('filament.admin.resources.suppliers.view', ['record' => $record->supplier_id]);
                     }, true),
                 Tables\Columns\TextColumn::make('categories.name')
                     ->listWithLineBreaks(),
@@ -139,7 +140,7 @@ class ProductResource extends Resource
                             ->when(
                                 $data['company'],
                                 fn (Builder $query, $country): Builder => $query->whereHas('supplier', function (Builder $query) use ($country): Builder {
-                                    return $query->where('name', 'LIKE', $country.'%');
+                                    return $query->where('name', 'LIKE', $country . '%');
                                 }),
                             );
                     }),

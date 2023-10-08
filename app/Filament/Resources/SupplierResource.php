@@ -80,6 +80,7 @@ class SupplierResource extends Resource
                     ->columnSpanFull(),
                 SpatieMediaLibraryFileUpload::make('image')
                     ->preserveFilenames()
+                    ->disk('public_html')
                     ->collection('supplier_media'),
             ]);
     }
@@ -148,7 +149,7 @@ class SupplierResource extends Resource
                         return $query
                             ->when(
                                 $data['company'],
-                                fn (Builder $query, $country): Builder => $query->where('name', 'LIKE', $country.'%'),
+                                fn (Builder $query, $country): Builder => $query->where('name', 'LIKE', $country . '%'),
                             );
                     }),
             ], layout: FiltersLayout::AboveContent)
