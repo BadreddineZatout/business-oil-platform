@@ -3,6 +3,7 @@
 namespace App\Filament\Resources;
 
 use App\Filament\Resources\SupplierResource\Pages;
+use App\Filament\Resources\SupplierResource\RelationManagers\ProductsRelationManager;
 use App\Models\Category;
 use App\Models\Country;
 use App\Models\Supplier;
@@ -149,7 +150,7 @@ class SupplierResource extends Resource
                         return $query
                             ->when(
                                 $data['company'],
-                                fn (Builder $query, $country): Builder => $query->where('name', 'LIKE', $country . '%'),
+                                fn (Builder $query, $country): Builder => $query->where('name', 'LIKE', $country.'%'),
                             );
                     }),
             ], layout: FiltersLayout::AboveContent)
@@ -162,6 +163,13 @@ class SupplierResource extends Resource
                     Tables\Actions\DeleteBulkAction::make(),
                 ]),
             ]);
+    }
+
+    public static function getRelations(): array
+    {
+        return [
+            ProductsRelationManager::class,
+        ];
     }
 
     public static function getPages(): array
