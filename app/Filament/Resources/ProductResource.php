@@ -140,7 +140,7 @@ class ProductResource extends Resource
                             ->when(
                                 $data['company'],
                                 fn (Builder $query, $country): Builder => $query->whereHas('supplier', function (Builder $query) use ($country): Builder {
-                                    return $query->where('name', 'LIKE', $country . '%');
+                                    return $query->where('name', 'LIKE', $country.'%');
                                 }),
                             );
                     }),
