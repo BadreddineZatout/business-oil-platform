@@ -14,7 +14,11 @@ class Supplier extends Model implements HasMedia
 {
     use HasFactory, InteractsWithMedia;
 
-    protected $fillable = ['name', 'country_id', 'email', 'description', 'address', 'phone1', 'phone2'];
+    protected $fillable = ['name', 'country_id', 'email', 'emails', 'description', 'address', 'phone1', 'phone2'];
+
+    protected $casts = [
+        'emails' => 'array'
+    ];
 
     public function country(): BelongsTo
     {
