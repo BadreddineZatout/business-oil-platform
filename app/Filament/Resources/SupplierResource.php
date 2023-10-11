@@ -2,25 +2,26 @@
 
 namespace App\Filament\Resources;
 
-use App\Filament\Resources\SupplierResource\Pages;
-use App\Filament\Resources\SupplierResource\RelationManagers\ProductsRelationManager;
-use App\Models\Category;
-use App\Models\Country;
-use App\Models\Supplier;
 use Filament\Forms;
+use Filament\Tables;
+use App\Models\Country;
+use App\Models\Category;
+use App\Models\Supplier;
+use Filament\Forms\Form;
+use Filament\Tables\Table;
+use Filament\Resources\Resource;
+use Filament\Tables\Filters\Filter;
 use Filament\Forms\Components\Radio;
 use Filament\Forms\Components\Select;
-use Filament\Forms\Components\SpatieMediaLibraryFileUpload;
-use Filament\Forms\Form;
-use Filament\Resources\Resource;
-use Filament\Tables;
-use Filament\Tables\Columns\SpatieMediaLibraryImageColumn;
-use Filament\Tables\Enums\FiltersLayout;
-use Filament\Tables\Filters\Filter;
-use Filament\Tables\Filters\SelectFilter;
-use Filament\Tables\Table;
-use Illuminate\Database\Eloquent\Builder;
+use Filament\Forms\Components\Repeater;
 use Illuminate\Database\Eloquent\Model;
+use Filament\Tables\Enums\FiltersLayout;
+use Filament\Tables\Filters\SelectFilter;
+use Illuminate\Database\Eloquent\Builder;
+use App\Filament\Resources\SupplierResource\Pages;
+use Filament\Tables\Columns\SpatieMediaLibraryImageColumn;
+use Filament\Forms\Components\SpatieMediaLibraryFileUpload;
+use App\Filament\Resources\SupplierResource\RelationManagers\ProductsRelationManager;
 
 class SupplierResource extends Resource
 {
@@ -64,6 +65,10 @@ class SupplierResource extends Resource
                 Forms\Components\TextInput::make('address')
                     ->required()
                     ->maxLength(255),
+                Repeater::make('emails')
+                    ->schema([
+                        Forms\Components\TextInput::make('other_mail')
+                    ])->columnSpanFull(),
                 Forms\Components\TextInput::make('phone1')
                     ->label('Phone Number 1')
                     ->tel()
@@ -150,7 +155,7 @@ class SupplierResource extends Resource
                         return $query
                             ->when(
                                 $data['company'],
-                                fn (Builder $query, $country): Builder => $query->where('name', 'LIKE', $country.'%'),
+                                fn (Builder $query, $country): Builder => $query->where('name', 'LIKE', $country . '%'),
                             );
                     }),
             ], layout: FiltersLayout::AboveContent)
