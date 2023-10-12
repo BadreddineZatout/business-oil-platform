@@ -2,26 +2,29 @@
 
 namespace App\Filament\Resources;
 
-use Filament\Forms;
-use Filament\Tables;
-use App\Models\Country;
-use App\Models\Category;
-use App\Models\Supplier;
-use Filament\Forms\Form;
-use Filament\Tables\Table;
-use Filament\Resources\Resource;
-use Filament\Tables\Filters\Filter;
-use Filament\Forms\Components\Radio;
-use Filament\Forms\Components\Select;
-use Filament\Forms\Components\Repeater;
-use Illuminate\Database\Eloquent\Model;
-use Filament\Tables\Enums\FiltersLayout;
-use Filament\Tables\Filters\SelectFilter;
-use Illuminate\Database\Eloquent\Builder;
 use App\Filament\Resources\SupplierResource\Pages;
-use Filament\Tables\Columns\SpatieMediaLibraryImageColumn;
-use Filament\Forms\Components\SpatieMediaLibraryFileUpload;
 use App\Filament\Resources\SupplierResource\RelationManagers\ProductsRelationManager;
+use App\Models\Category;
+use App\Models\Country;
+use App\Models\Supplier;
+use Filament\Forms;
+use Filament\Forms\Components\Radio;
+use Filament\Forms\Components\Repeater;
+use Filament\Forms\Components\Select;
+use Filament\Forms\Components\SpatieMediaLibraryFileUpload;
+use Filament\Forms\Form;
+use Filament\Resources\Resource;
+use Filament\Tables;
+use Filament\Tables\Columns\SpatieMediaLibraryImageColumn;
+use Filament\Tables\Enums\FiltersLayout;
+use Filament\Tables\Filters\Filter;
+use Filament\Tables\Filters\SelectFilter;
+use Filament\Tables\Table;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Model;
+use pxlrbt\FilamentExcel\Actions\Tables\ExportAction;
+use pxlrbt\FilamentExcel\Actions\Tables\ExportBulkAction;
+use pxlrbt\FilamentExcel\Exports\ExcelExport;
 
 class SupplierResource extends Resource
 {
@@ -67,7 +70,7 @@ class SupplierResource extends Resource
                     ->maxLength(255),
                 Repeater::make('emails')
                     ->schema([
-                        Forms\Components\TextInput::make('other_mail')
+                        Forms\Components\TextInput::make('other_mail'),
                     ])->columnSpanFull(),
                 Forms\Components\TextInput::make('phone1')
                     ->label('Phone Number 1')
@@ -159,6 +162,11 @@ class SupplierResource extends Resource
                             );
                     }),
             ], layout: FiltersLayout::AboveContent)
+            ->headerActions([
+                ExportAction::make()->exports([
+                    ExcelExport::make()->fromTable()->except(['image']),
+                ]),
+            ])
             ->actions([
                 Tables\Actions\ViewAction::make(),
                 Tables\Actions\EditAction::make(),
@@ -166,6 +174,9 @@ class SupplierResource extends Resource
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
                     Tables\Actions\DeleteBulkAction::make(),
+                    ExportBulkAction::make()->exports([
+                        ExcelExport::make()->fromTable()->except(['image']),
+                    ]),
                 ]),
             ]);
     }
