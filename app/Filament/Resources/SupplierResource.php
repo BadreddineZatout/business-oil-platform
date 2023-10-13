@@ -158,7 +158,7 @@ class SupplierResource extends Resource
                         return $query
                             ->when(
                                 $data['company'],
-                                fn (Builder $query, $country): Builder => $query->where('name', 'LIKE', $country . '%'),
+                                fn (Builder $query, $country): Builder => $query->where('name', 'LIKE', $country.'%'),
                             );
                     }),
             ], layout: FiltersLayout::AboveContent)
