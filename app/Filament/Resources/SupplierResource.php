@@ -14,6 +14,7 @@ use Filament\Forms\Components\Repeater;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\SpatieMediaLibraryFileUpload;
 use Filament\Forms\Form;
+use Filament\Forms\Get;
 use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
 use Filament\Support\Colors\Color;
@@ -88,7 +89,14 @@ class SupplierResource extends Resource
                     ->maxLength(65535)
                     ->columnSpanFull(),
                 Forms\Components\Select::make('category')
-                    ->options(Category::all()->pluck('name', 'id'))
+                    ->options(Category::whereNull('parent_id')->get()->pluck('name', 'id'))
+                    ->multiple()
+                    ->required()
+                    ->live()
+                    ->columnSpanFull(),
+                Forms\Components\Select::make('sub_category')
+                    ->label('Sub Category')
+                    ->options(fn (Get $get) => Category::whereIn('parent_id', $get('category'))->pluck('name', 'id'))
                     ->multiple()
                     ->required()
                     ->columnSpanFull(),
@@ -109,7 +117,13 @@ class SupplierResource extends Resource
                 Tables\Columns\TextColumn::make('name')
                     ->searchable()
                     ->toggleable(),
-                Tables\Columns\TextColumn::make('categories.name')
+                Tables\Columns\TextColumn::make('mainCategories.name')
+                    ->label('Categories')
+                    ->listWithLineBreaks()
+                    ->toggleable(),
+                Tables\Columns\TextColumn::make('subCategories.name')
+                    ->label('Sub Categories')
+                    ->default('--')
                     ->listWithLineBreaks()
                     ->toggleable(),
                 Tables\Columns\TextColumn::make('country.name')
@@ -163,7 +177,7 @@ class SupplierResource extends Resource
                         return $query
                             ->when(
                                 $data['company'],
-                                fn (Builder $query, $country): Builder => $query->where('name', 'LIKE', $country . '%'),
+                                fn (Builder $query, $country): Builder => $query->where('name', 'LIKE', $country.'%'),
                             );
                     }),
             ], layout: FiltersLayout::AboveContent)

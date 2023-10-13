@@ -27,7 +27,7 @@ class EditSupplier extends EditRecord
 
     protected function afterSave(): void
     {
-        $this->record->categories()->sync($this->data['category']);
+        $this->record->categories()->sync([...$this->data['category'], ...$this->data['sub_category']]);
     }
 
     protected function getRedirectUrl(): string
