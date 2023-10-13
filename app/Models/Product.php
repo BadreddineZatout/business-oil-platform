@@ -24,4 +24,14 @@ class Product extends Model implements HasMedia
     {
         return $this->belongsToMany(Category::class);
     }
+
+    public function mainCategories(): BelongsToMany
+    {
+        return $this->belongsToMany(Category::class)->whereNull('parent_id');
+    }
+
+    public function subCategories(): BelongsToMany
+    {
+        return $this->belongsToMany(Category::class)->whereNotNull('parent_id');
+    }
 }
