@@ -11,6 +11,6 @@ class CreateProduct extends CreateRecord
 
     protected function afterCreate(): void
     {
-        $this->record->categories()->attach($this->data['category']);
+        $this->record->categories()->attach([...$this->data['category'], ...$this->data['sub_category']]);
     }
 }

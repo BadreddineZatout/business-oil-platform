@@ -2,28 +2,29 @@
 
 namespace App\Filament\Resources;
 
-use App\Filament\Resources\ProductResource\Pages;
-use App\Models\Category;
+use Filament\Forms;
+use Filament\Tables;
 use App\Models\Country;
 use App\Models\Product;
-use Filament\Forms;
+use Filament\Forms\Get;
+use App\Models\Category;
+use Filament\Forms\Form;
+use Filament\Tables\Table;
+use Filament\Resources\Resource;
+use Filament\Tables\Filters\Filter;
 use Filament\Forms\Components\Radio;
 use Filament\Forms\Components\Select;
-use Filament\Forms\Components\SpatieMediaLibraryFileUpload;
-use Filament\Forms\Form;
-use Filament\Resources\Resource;
 use Filament\Support\Enums\FontWeight;
-use Filament\Tables;
-use Filament\Tables\Columns\SpatieMediaLibraryImageColumn;
-use Filament\Tables\Enums\FiltersLayout;
-use Filament\Tables\Filters\Filter;
-use Filament\Tables\Filters\SelectFilter;
-use Filament\Tables\Table;
-use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
+use Filament\Tables\Enums\FiltersLayout;
+use Filament\Tables\Filters\SelectFilter;
+use Illuminate\Database\Eloquent\Builder;
+use pxlrbt\FilamentExcel\Exports\ExcelExport;
+use App\Filament\Resources\ProductResource\Pages;
 use pxlrbt\FilamentExcel\Actions\Tables\ExportAction;
 use pxlrbt\FilamentExcel\Actions\Tables\ExportBulkAction;
-use pxlrbt\FilamentExcel\Exports\ExcelExport;
+use Filament\Tables\Columns\SpatieMediaLibraryImageColumn;
+use Filament\Forms\Components\SpatieMediaLibraryFileUpload;
 
 class ProductResource extends Resource
 {
@@ -64,7 +65,14 @@ class ProductResource extends Resource
                     ->maxLength(65535)
                     ->columnSpanFull(),
                 Forms\Components\Select::make('category')
-                    ->options(Category::all()->pluck('name', 'id'))
+                    ->options(Category::whereNull('parent_id')->get()->pluck('name', 'id'))
+                    ->multiple()
+                    ->required()
+                    ->live()
+                    ->columnSpanFull(),
+                Forms\Components\Select::make('sub_category')
+                    ->label('Sub Category')
+                    ->options(fn (Get $get) => Category::whereIn('parent_id', $get('category'))->pluck('name', 'id'))
                     ->multiple()
                     ->required()
                     ->columnSpanFull(),
@@ -89,7 +97,12 @@ class ProductResource extends Resource
                     ->url(function ($record) {
                         return route('filament.admin.resources.suppliers.view', ['record' => $record->supplier_id]);
                     }, true),
-                Tables\Columns\TextColumn::make('categories.name')
+                Tables\Columns\TextColumn::make('mainCategories.name')
+                    ->label('Categories')
+                    ->listWithLineBreaks(),
+                Tables\Columns\TextColumn::make('subCategories.name')
+                    ->label('Sub Categories')
+                    ->default('--')
                     ->listWithLineBreaks(),
             ])
             ->filters([
@@ -143,7 +156,7 @@ class ProductResource extends Resource
                             ->when(
                                 $data['company'],
                                 fn (Builder $query, $country): Builder => $query->whereHas('supplier', function (Builder $query) use ($country): Builder {
-                                    return $query->where('name', 'LIKE', $country.'%');
+                                    return $query->where('name', 'LIKE', $country . '%');
                                 }),
                             );
                     }),

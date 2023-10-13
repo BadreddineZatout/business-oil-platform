@@ -19,7 +19,8 @@ class ViewProduct extends ViewRecord
 
     protected function mutateFormDataBeforeFill(array $data): array
     {
-        $data['category'] = $this->record->categories->pluck('id')->toArray();
+        $data['category'] = $this->record->mainCategories->pluck('id')->toArray();
+        $data['sub_category'] = $this->record->subCategories->pluck('id')->toArray();
 
         return $data;
     }
