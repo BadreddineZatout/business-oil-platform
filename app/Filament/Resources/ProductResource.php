@@ -2,28 +2,28 @@
 
 namespace App\Filament\Resources;
 
-use Filament\Forms;
-use Filament\Tables;
+use App\Filament\Resources\ProductResource\Pages;
+use App\Models\Category;
 use App\Models\Country;
 use App\Models\Product;
-use App\Models\Category;
-use Filament\Forms\Form;
-use Filament\Tables\Table;
-use Filament\Resources\Resource;
-use Filament\Tables\Filters\Filter;
+use Filament\Forms;
 use Filament\Forms\Components\Radio;
 use Filament\Forms\Components\Select;
+use Filament\Forms\Components\SpatieMediaLibraryFileUpload;
+use Filament\Forms\Form;
+use Filament\Resources\Resource;
 use Filament\Support\Enums\FontWeight;
-use Illuminate\Database\Eloquent\Model;
+use Filament\Tables;
+use Filament\Tables\Columns\SpatieMediaLibraryImageColumn;
 use Filament\Tables\Enums\FiltersLayout;
+use Filament\Tables\Filters\Filter;
 use Filament\Tables\Filters\SelectFilter;
+use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
-use pxlrbt\FilamentExcel\Exports\ExcelExport;
-use App\Filament\Resources\ProductResource\Pages;
+use Illuminate\Database\Eloquent\Model;
 use pxlrbt\FilamentExcel\Actions\Tables\ExportAction;
 use pxlrbt\FilamentExcel\Actions\Tables\ExportBulkAction;
-use Filament\Tables\Columns\SpatieMediaLibraryImageColumn;
-use Filament\Forms\Components\SpatieMediaLibraryFileUpload;
+use pxlrbt\FilamentExcel\Exports\ExcelExport;
 
 class ProductResource extends Resource
 {
@@ -143,7 +143,7 @@ class ProductResource extends Resource
                             ->when(
                                 $data['company'],
                                 fn (Builder $query, $country): Builder => $query->whereHas('supplier', function (Builder $query) use ($country): Builder {
-                                    return $query->where('name', 'LIKE', $country . '%');
+                                    return $query->where('name', 'LIKE', $country.'%');
                                 }),
                             );
                     }),
