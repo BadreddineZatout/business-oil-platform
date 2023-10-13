@@ -13,6 +13,7 @@ class sendEmailAction
      * @var PostmarkClient
      */
     protected $client;
+
     /**
      * sender email address
      *
@@ -26,7 +27,7 @@ class sendEmailAction
         $this->sender = env('POSTMARK_SENDER');
     }
 
-    function handle($receiver, $title, $message)
+    public function handle($receiver, $title, $message)
     {
         try {
             $response = $this->client->sendEmail(
@@ -35,6 +36,7 @@ class sendEmailAction
                 $title,
                 $message
             );
+
             return $response->message;
         } catch (\Throwable $th) {
             throw new EmailFailedException($th->getMessage());
