@@ -19,7 +19,8 @@ class ViewSupplier extends ViewRecord
 
     protected function mutateFormDataBeforeFill(array $data): array
     {
-        $data['category'] = $this->record->categories->pluck('id')->toArray();
+        $data['category'] = $this->record->categories->whereNull('parent_id')->pluck('id')->toArray();
+        $data['sub_category'] = $this->record->categories->whereNotNull('parent_id')->pluck('id')->toArray();
 
         return $data;
     }
