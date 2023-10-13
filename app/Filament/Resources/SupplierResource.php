@@ -161,11 +161,35 @@ class SupplierResource extends Resource
                     ->multiple()
                     ->searchable()
                     ->preload(),
-                SelectFilter::make('Categories')
-                    ->relationship('categories', 'name')
-                    ->multiple()
-                    ->searchable()
-                    ->preload(),
+                Filter::make('Categories')
+                    ->form([
+                        Select::make('category')
+                            ->relationship('mainCategories', 'name')
+                            ->multiple()
+                            ->searchable()
+                            ->live()
+                            ->preload(),
+                        Select::make('sub_category')
+                            ->relationship('subCategories', 'name', fn (Builder $query, Get $get) => $query->where('parent_id', $get('category')))
+                            ->multiple()
+                            ->searchable()
+                            ->preload(),
+                    ])
+                    ->query(function (Builder $query, array $data): Builder {
+                        return $query
+                            ->when(
+                                $data['category'],
+                                function (Builder $query, $categories): Builder {
+                                    return $query->whereHas('mainCategories', fn (Builder $query) => $query->whereIn('categories.id', $categories));
+                                },
+                            )
+                            ->when(
+                                $data['sub_category'],
+                                function (Builder $query, $sub_categories): Builder {
+                                    return $query->whereHas('subCategories', fn (Builder $query) => $query->whereIn('categories.id', $sub_categories));
+                                },
+                            );
+                    }),
                 Filter::make('companies')
                     ->form([
                         Select::make('company')
