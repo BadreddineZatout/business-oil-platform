@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources;
 
+use App\Actions\SendEmailAction;
 use App\Filament\Resources\SupplierResource\Pages;
 use App\Filament\Resources\SupplierResource\RelationManagers\ProductsRelationManager;
 use App\Models\Category;
@@ -13,14 +14,18 @@ use Filament\Forms\Components\Repeater;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\SpatieMediaLibraryFileUpload;
 use Filament\Forms\Form;
+use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
+use Filament\Support\Colors\Color;
 use Filament\Tables;
+use Filament\Tables\Actions\BulkAction;
 use Filament\Tables\Columns\SpatieMediaLibraryImageColumn;
 use Filament\Tables\Enums\FiltersLayout;
 use Filament\Tables\Filters\Filter;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
 use pxlrbt\FilamentExcel\Actions\Tables\ExportAction;
 use pxlrbt\FilamentExcel\Actions\Tables\ExportBulkAction;
@@ -174,6 +179,33 @@ class SupplierResource extends Resource
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
                     Tables\Actions\DeleteBulkAction::make(),
+                    BulkAction::make('send_email')
+                        ->label('Send Email')
+                        ->icon('heroicon-o-envelope')
+                        ->color(Color::Lime)
+
+                        ->form([
+                            Forms\Components\TextInput::make('title')
+                                ->required(),
+                            Forms\Components\TextArea::make('message')
+                                ->required(),
+                        ])
+                        ->action(function (array $data, Collection $records, SendEmailAction $sendEmailAction) {
+                            $records->each(function ($record) use ($sendEmailAction, $data) {
+                                $sendEmailAction->handle($record->email, $data['title'], $data['message']);
+                            });
+                        })->failureNotification(
+                            Notification::make()
+                                ->danger()
+                                ->title('Email Not Sent')
+                                ->body('The email has not been sent.'),
+                        )
+                        ->successNotification(
+                            Notification::make()
+                                ->success()
+                                ->title('Email Sent')
+                                ->body('The email has been sent successfully.'),
+                        )->deselectRecordsAfterCompletion(),
                     ExportBulkAction::make()->exports([
                         ExcelExport::make()->fromTable()->except(['image']),
                     ]),
