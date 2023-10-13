@@ -163,7 +163,7 @@ class SupplierResource extends Resource
                         return $query
                             ->when(
                                 $data['company'],
-                                fn (Builder $query, $country): Builder => $query->where('name', 'LIKE', $country.'%'),
+                                fn (Builder $query, $country): Builder => $query->where('name', 'LIKE', $country . '%'),
                             );
                     }),
             ], layout: FiltersLayout::AboveContent)
@@ -187,7 +187,7 @@ class SupplierResource extends Resource
                         ->form([
                             Forms\Components\TextInput::make('title')
                                 ->required(),
-                            Forms\Components\TextArea::make('message')
+                            Forms\Components\Textarea::make('message')
                                 ->required(),
                         ])
                         ->action(function (array $data, Collection $records, SendEmailAction $sendEmailAction) {
