@@ -98,7 +98,6 @@ class SupplierResource extends Resource
                     ->label('Sub Category')
                     ->options(fn (Get $get) => Category::whereIn('parent_id', $get('category'))->pluck('name', 'id'))
                     ->multiple()
-                    ->required()
                     ->columnSpanFull(),
                 SpatieMediaLibraryFileUpload::make('image')
                     ->preserveFilenames()
@@ -170,7 +169,7 @@ class SupplierResource extends Resource
                             ->live()
                             ->preload(),
                         Select::make('sub_category')
-                            ->relationship('subCategories', 'name', fn (Builder $query, Get $get) => $query->where('parent_id', $get('category')))
+                            ->relationship('subCategories', 'name', fn (Builder $query, Get $get) => $query->whereIn('parent_id', $get('category')))
                             ->multiple()
                             ->searchable()
                             ->preload(),
@@ -201,7 +200,7 @@ class SupplierResource extends Resource
                         return $query
                             ->when(
                                 $data['company'],
-                                fn (Builder $query, $country): Builder => $query->where('name', 'LIKE', $country.'%'),
+                                fn (Builder $query, $country): Builder => $query->where('name', 'LIKE', $country . '%'),
                             );
                     }),
             ], layout: FiltersLayout::AboveContent)

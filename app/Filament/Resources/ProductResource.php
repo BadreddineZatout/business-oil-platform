@@ -2,29 +2,29 @@
 
 namespace App\Filament\Resources;
 
-use Filament\Forms;
-use Filament\Tables;
+use App\Filament\Resources\ProductResource\Pages;
+use App\Models\Category;
 use App\Models\Country;
 use App\Models\Product;
-use Filament\Forms\Get;
-use App\Models\Category;
-use Filament\Forms\Form;
-use Filament\Tables\Table;
-use Filament\Resources\Resource;
-use Filament\Tables\Filters\Filter;
+use Filament\Forms;
 use Filament\Forms\Components\Radio;
 use Filament\Forms\Components\Select;
+use Filament\Forms\Components\SpatieMediaLibraryFileUpload;
+use Filament\Forms\Form;
+use Filament\Forms\Get;
+use Filament\Resources\Resource;
 use Filament\Support\Enums\FontWeight;
-use Illuminate\Database\Eloquent\Model;
+use Filament\Tables;
+use Filament\Tables\Columns\SpatieMediaLibraryImageColumn;
 use Filament\Tables\Enums\FiltersLayout;
+use Filament\Tables\Filters\Filter;
 use Filament\Tables\Filters\SelectFilter;
+use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
-use pxlrbt\FilamentExcel\Exports\ExcelExport;
-use App\Filament\Resources\ProductResource\Pages;
+use Illuminate\Database\Eloquent\Model;
 use pxlrbt\FilamentExcel\Actions\Tables\ExportAction;
 use pxlrbt\FilamentExcel\Actions\Tables\ExportBulkAction;
-use Filament\Tables\Columns\SpatieMediaLibraryImageColumn;
-use Filament\Forms\Components\SpatieMediaLibraryFileUpload;
+use pxlrbt\FilamentExcel\Exports\ExcelExport;
 
 class ProductResource extends Resource
 {
@@ -74,7 +74,6 @@ class ProductResource extends Resource
                     ->label('Sub Category')
                     ->options(fn (Get $get) => Category::whereIn('parent_id', $get('category'))->pluck('name', 'id'))
                     ->multiple()
-                    ->required()
                     ->columnSpanFull(),
                 SpatieMediaLibraryFileUpload::make('image')
                     ->preserveFilenames()
@@ -139,11 +138,35 @@ class ProductResource extends Resource
                                 }),
                             );
                     }),
-                SelectFilter::make('Categories')
-                    ->relationship('categories', 'name')
-                    ->multiple()
-                    ->searchable()
-                    ->preload(),
+                Filter::make('Categories')
+                    ->form([
+                        Select::make('category')
+                            ->relationship('mainCategories', 'name')
+                            ->multiple()
+                            ->searchable()
+                            ->live()
+                            ->preload(),
+                        Select::make('sub_category')
+                            ->relationship('subCategories', 'name', fn (Builder $query, Get $get) => $query->whereIn('parent_id', $get('category')))
+                            ->multiple()
+                            ->searchable()
+                            ->preload(),
+                    ])
+                    ->query(function (Builder $query, array $data): Builder {
+                        return $query
+                            ->when(
+                                $data['category'],
+                                function (Builder $query, $categories): Builder {
+                                    return $query->whereHas('mainCategories', fn (Builder $query) => $query->whereIn('categories.id', $categories));
+                                },
+                            )
+                            ->when(
+                                $data['sub_category'],
+                                function (Builder $query, $sub_categories): Builder {
+                                    return $query->whereHas('subCategories', fn (Builder $query) => $query->whereIn('categories.id', $sub_categories));
+                                },
+                            );
+                    }),
                 Filter::make('companies')
                     ->form([
                         Select::make('company')
@@ -178,13 +201,6 @@ class ProductResource extends Resource
                     ]),
                 ]),
             ]);
-    }
-
-    public static function getRelations(): array
-    {
-        return [
-            //
-        ];
     }
 
     public static function getPages(): array
