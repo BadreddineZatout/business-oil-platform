@@ -34,7 +34,7 @@ class sendEmailAction
         try {
             if ($data['attachment']) {
                 $attachment = PostmarkAttachment::fromRawData(
-                    Storage::disk('public')->get($data['attachment']),
+                    Storage::disk(env('FILAMENT_FILESYSTEM_DISK'))->get($data['attachment']),
                     $data['attachment']
                 );
             }
