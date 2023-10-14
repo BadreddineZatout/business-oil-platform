@@ -136,6 +136,7 @@ class SupplierResource extends Resource
                 Tables\Columns\TextColumn::make('phone2')
                     ->toggleable()
                     ->default('---'),
+                Tables\Columns\TextColumn::make('description')->hidden(),
             ])
             ->filters([
                 Filter::make('supplier_region')
@@ -200,7 +201,7 @@ class SupplierResource extends Resource
                         return $query
                             ->when(
                                 $data['company'],
-                                fn (Builder $query, $country): Builder => $query->where('name', 'LIKE', $country.'%'),
+                                fn (Builder $query, $country): Builder => $query->where('name', 'LIKE', $country . '%'),
                             );
                     }),
             ], layout: FiltersLayout::AboveContent)
