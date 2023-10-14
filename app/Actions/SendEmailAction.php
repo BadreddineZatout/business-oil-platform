@@ -3,6 +3,8 @@
 namespace App\Actions;
 
 use App\Exceptions\EmailFailedException;
+use Illuminate\Support\Facades\Storage;
+use Postmark\Models\PostmarkAttachment;
 use Postmark\PostmarkClient;
 
 class sendEmailAction
@@ -27,19 +29,28 @@ class sendEmailAction
         $this->sender = env('POSTMARK_SENDER');
     }
 
-    public function handle($receiver, $title, $message)
+    public function handle($receiver, $data)
     {
         try {
+            if ($data['attachment']) {
+                $attachment = PostmarkAttachment::fromRawData(
+                    Storage::disk('public')->get($data['attachment']),
+                    $data['attachment']
+                );
+            }
             $response = $this->client->sendEmail(
                 $this->sender,
                 $receiver,
-                $title,
-                $message
+                $data['title'],
+                $data['message'],
+                attachments: isset($attachment) ? [$attachment] : null
             );
 
             return $response->message;
         } catch (\Throwable $th) {
             throw new EmailFailedException($th->getMessage());
+        } finally {
+            Storage::disk('public')->delete($data['attachment']);
         }
     }
 }

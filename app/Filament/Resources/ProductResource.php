@@ -18,7 +18,6 @@ use Filament\Tables;
 use Filament\Tables\Columns\SpatieMediaLibraryImageColumn;
 use Filament\Tables\Enums\FiltersLayout;
 use Filament\Tables\Filters\Filter;
-use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
@@ -179,7 +178,7 @@ class ProductResource extends Resource
                             ->when(
                                 $data['company'],
                                 fn (Builder $query, $country): Builder => $query->whereHas('supplier', function (Builder $query) use ($country): Builder {
-                                    return $query->where('name', 'LIKE', $country . '%');
+                                    return $query->where('name', 'LIKE', $country.'%');
                                 }),
                             );
                     }),
