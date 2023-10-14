@@ -50,7 +50,7 @@ class sendEmailAction
         } catch (\Throwable $th) {
             throw new EmailFailedException($th->getMessage());
         } finally {
-            Storage::disk('public')->delete($data['attachment']);
+            if ($data['attachment']) Storage::disk('public')->delete($data['attachment']);
         }
     }
 }
