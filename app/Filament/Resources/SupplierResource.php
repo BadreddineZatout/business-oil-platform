@@ -200,7 +200,7 @@ class SupplierResource extends Resource
                         return $query
                             ->when(
                                 $data['company'],
-                                fn (Builder $query, $country): Builder => $query->where('name', 'LIKE', $country . '%'),
+                                fn (Builder $query, $country): Builder => $query->where('name', 'LIKE', $country.'%'),
                             );
                     }),
             ], layout: FiltersLayout::AboveContent)
@@ -226,10 +226,12 @@ class SupplierResource extends Resource
                                 ->required(),
                             Forms\Components\Textarea::make('message')
                                 ->required(),
+                            Forms\Components\FileUpload::make('attachment')
+                                ->preserveFilenames(),
                         ])
                         ->action(function (array $data, Collection $records, SendEmailAction $sendEmailAction) {
                             $records->each(function ($record) use ($sendEmailAction, $data) {
-                                $sendEmailAction->handle($record->email, $data['title'], $data['message']);
+                                $sendEmailAction->handle($record->email, $data);
                             });
                         })->failureNotification(
                             Notification::make()
